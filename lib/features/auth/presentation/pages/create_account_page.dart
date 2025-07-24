@@ -168,7 +168,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             Get.snackbar(
               "Success",
               state.message,
-              backgroundColor: AppColors.success5,
+              colorText: AppColors.white,
+              backgroundColor: AppColors.success50,
               snackPosition: SnackPosition.BOTTOM,
               duration: const Duration(seconds: 4),
             );
@@ -179,6 +180,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           Get.snackbar(
             "Error",
             state.message,
+            colorText: AppColors.white,
             backgroundColor: AppColors.error50,
             snackPosition: SnackPosition.BOTTOM,
             duration: const Duration(seconds: 4),
