@@ -109,6 +109,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         "Error",
         "Please fill all required fields correctly.",
         backgroundColor: AppColors.error50,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 4),
       );
@@ -306,19 +307,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   Expanded _buildStepper(bool done, bool active, int i, List<String> stepTitles,
       BuildContext context) {
     return Expanded(
-      child: ElevatedButton(
+      child: OutlinedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              done || active ? AppColors.black : Colors.transparent,
+          backgroundColor: done || active ? AppColors.black : AppColors.white,
           fixedSize: Size(100.w, 31.h),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100.r),
             side: BorderSide(
-              color: done
-                  ? AppColors.black
-                  : active
-                      ? AppColors.black
-                      : AppColors.grey,
+              color: done || active ? AppColors.black : AppColors.grey,
               width: 1.w,
             ),
           ),

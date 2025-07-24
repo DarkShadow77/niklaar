@@ -32,12 +32,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     if (response.responseSuccessful!) {
       Logger().t(
-          "Step On Registered Successfully ${response.responseMessage!},${response.responseBody!}");
+          "Step One Registered Successfully ${response.responseMessage!},${response.responseBody!}");
 
       emit(
         AuthSuccessState(
           authType: AuthType.registerStepOne,
-          message: "Step On Registered Successfully",
+          message: "Step One Registered Successfully",
         ),
       );
 
@@ -48,7 +48,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(
         AuthFailureState(
           authType: AuthType.registerStepOne,
-          message: "Failed To Register",
+          message: response.responseMessage!,
         ),
       );
     }
@@ -78,7 +78,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(
         AuthFailureState(
           authType: AuthType.registerStepTwo,
-          message: "Failed To Register",
+          message: response.responseMessage!,
         ),
       );
     }
