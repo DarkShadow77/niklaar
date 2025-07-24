@@ -31,21 +31,24 @@ class CreateAccountPage extends StatefulWidget {
 class _CreateAccountPageState extends State<CreateAccountPage> {
   int currentStep = 0;
 
-  final _basicInfoKey = GlobalKey<FormState>();
-  final _usernameKey = GlobalKey<FormState>();
-  final _passwordKey = GlobalKey<FormState>();
-
   // form field controllers...
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-
   final _userCtrl = TextEditingController();
   final _refCodeCtrl = TextEditingController();
-
   final _passwordCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
+
+  bool _isFirstNameValid = false;
+  bool _isLastNameValid = false;
+  bool _isEmailValid = false;
+  bool _isPhoneValid = false;
+  bool _isUserValid = false;
+  bool _isPasswordValid = false;
+  bool _isConfirmPasswordValid = false;
+  bool _isFormValid = true;
 
   @override
   void dispose() {
@@ -60,10 +63,57 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     super.dispose();
   }
 
+  void _validateForm() {
+    String firstName = _firstNameCtrl.text.trim();
+    String lastName = _lastNameCtrl.text.trim();
+    String email = _emailCtrl.text.trim();
+    String phone = _phoneCtrl.text.trim();
+    String username = _userCtrl.text.trim();
+    String password = _passwordCtrl.text.trim();
+    String confirmPassword = _confirmCtrl.text.trim();
+
+    setState(() {
+      if (currentStep == 0) {
+        _isFirstNameValid = firstName.isNotEmpty;
+        _isLastNameValid = lastName.isNotEmpty;
+        _isEmailValid = GetUtils.isEmail(email);
+        _isPhoneValid = GetUtils.isPhoneNumber(phone);
+      } else if (currentStep == 1) {
+        _isUserValid = username.isNotEmpty;
+      } else {
+        _isPasswordValid = password.length >= 8;
+        _isConfirmPasswordValid = password == confirmPassword;
+      }
+    });
+  }
+
+  bool _formValidation() {
+    if (currentStep == 0) {
+      return _isFirstNameValid &&
+          _isLastNameValid &&
+          _isEmailValid &&
+          _isPhoneValid;
+    } else if (currentStep == 1) {
+      return _isUserValid;
+    } else {
+      return _isPasswordValid && _isConfirmPasswordValid;
+    }
+  }
+
   void _nextStep() {
-    final formKeys = [_basicInfoKey, _usernameKey, _passwordKey];
-    final form = formKeys[currentStep].currentState!;
-    if (!form.validate()) return;
+    _validateForm();
+    _isFormValid = _formValidation();
+
+    if (!_isFormValid) {
+      Get.snackbar(
+        "Error",
+        "Please fill all required fields correctly.",
+        backgroundColor: AppColors.error50,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 4),
+      );
+      return;
+    }
 
     if (currentStep == 0) {
       String code = widget.params.country.phoneCode;
@@ -138,10 +188,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            title: NiklaarIcon(
-              width: 39.6,
-              height: 28,
-              opacity: 0,
+            title: Opacity(
+              opacity: currentStep == 2 ? 0 : 1,
+              child: NiklaarIcon(
+                width: 39.6,
+                height: 28,
+                opacity: 0,
+              ),
             ),
             automaticallyImplyLeading: true,
             titleSpacing: 24.w,
@@ -150,23 +203,34 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 padding: EdgeInsets.symmetric(
                   horizontal: 12.w,
                 ),
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    overlayColor: AppColors.black25,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                    ),
-                  ),
-                  child: RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      text: "Sign In",
-                      style: TextStyles.normalRegular14(context).copyWith(
-                        color: AppColors.blue,
+                child: Row(
+                  children: [
+                    if (currentStep == 2)
+                      NiklaarIcon(
+                        width: 39.6,
+                        height: 28,
+                        opacity: 0,
+                      )
+                    else
+                      TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          overlayColor: AppColors.black25,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                          ),
+                        ),
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: "Sign In",
+                            style: TextStyles.normalRegular14(context).copyWith(
+                              color: AppColors.blue,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                  ],
                 ),
               )
             ],
@@ -224,14 +288,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
                 ActionButton(
                   onPressed: _nextStep,
-                  waiting: [
-                        _basicInfoKey,
-                        _usernameKey,
-                        _passwordKey
-                      ][currentStep]
-                          .currentState
-                          ?.validate() ??
-                      false,
+                  waiting: _formValidation(),
+                  waitOnPressed: _nextStep,
                   text: currentStep < 2 ? 'Continue' : 'Create account',
                 ),
                 SizedBox(
@@ -250,7 +308,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     return Expanded(
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: done || active ? AppColors.black : AppColors.error,
+          backgroundColor:
+              done || active ? AppColors.black : Colors.transparent,
+          fixedSize: Size(100.w, 31.h),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100.r),
             side: BorderSide(
@@ -267,7 +327,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         onPressed:
             i <= currentStep ? () => setState(() => currentStep = i) : null,
         child: Row(
-          spacing: 4.w,
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -294,7 +353,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   Widget _buildBasicInfoForm() {
     return Form(
-      key: _basicInfoKey,
       child: ListView(
         padding: EdgeInsets.symmetric(vertical: 8.h),
         children: [
@@ -304,7 +362,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           TextInputField(
             controller: _firstNameCtrl,
             hintText: 'Stephen',
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            errorBool: !_isFormValid && !_isFirstNameValid,
+            onChanged: (value) => _validateForm(),
           ),
           SizedBox(
             height: 16.h,
@@ -315,7 +374,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           TextInputField(
             controller: _lastNameCtrl,
             hintText: "Reign",
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            errorBool: !_isFormValid && !_isLastNameValid,
+            onChanged: (value) => _validateForm(),
           ),
           SizedBox(
             height: 16.h,
@@ -326,8 +386,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           TextInputField(
             controller: _emailCtrl,
             hintText: "stephenreign@gmail.com",
-            validator: (v) =>
-                GetUtils.isEmail(v!) ? null : 'Enter a valid email',
+            errorBool: !_isFormValid && !_isEmailValid,
+            textInputType: TextInputType.emailAddress,
+            onChanged: (value) => _validateForm(),
           ),
           SizedBox(
             height: 16.h,
@@ -337,9 +398,22 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           ),
           TextInputField(
             controller: _phoneCtrl,
-            hintText: "stephenreign@gmail.com",
-            validator: (v) =>
-                !GetUtils.isPhoneNumber(v!) ? 'Enter a valid phone' : null,
+            hintText: "00000000000",
+            errorBool: !_isFormValid && !_isPhoneValid,
+            textInputType: TextInputType.phone,
+            onChanged: (value) => _validateForm(),
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text: "+${widget.params.country.phoneCode}",
+                    style: TextStyles.normalRegular14(context),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -348,7 +422,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   Widget _buildUsernameForm() {
     return Form(
-      key: _usernameKey,
       child: ListView(
         padding: EdgeInsets.symmetric(vertical: 8.h),
         children: [
@@ -358,7 +431,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           TextInputField(
             controller: _userCtrl,
             hintText: "@username",
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            errorBool: !_isFormValid && !_isUserValid,
+            onChanged: (value) => _validateForm(),
           ),
           SizedBox(
             height: 16.h,
@@ -377,7 +451,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   Widget _buildPasswordForm() {
     return Form(
-      key: _passwordKey,
       child: ListView(
         padding: EdgeInsets.symmetric(vertical: 8.h),
         children: [
@@ -388,8 +461,19 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             controller: _passwordCtrl,
             hintText: "Enter your password",
             isPassword: true,
-            validator: (v) =>
-                v!.length >= 8 ? null : 'Must be at least 8 characters',
+            errorBool: !_isFormValid && !_isPasswordValid,
+            onChanged: (value) => _validateForm(),
+          ),
+          SizedBox(
+            height: 5.h,
+          ),
+          RichText(
+            text: TextSpan(
+              text: "Must be at least 8 characters.",
+              style: TextStyles.cardRegular10(context).copyWith(
+                color: AppColors.black40,
+              ),
+            ),
           ),
           SizedBox(
             height: 16.h,
@@ -401,8 +485,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             controller: _confirmCtrl,
             hintText: "Confirm your password",
             isPassword: true,
-            validator: (v) =>
-                v == _passwordCtrl.text ? null : 'Passwords must match',
+            errorBool: !_isFormValid && !_isConfirmPasswordValid,
+            onChanged: (value) => _validateForm(),
           ),
         ],
       ),

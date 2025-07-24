@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
+import '../../../../core/utils/local_storage.dart';
 import '../../data/models/step_one_request_model.dart';
 import '../../data/models/step_two_request_model.dart';
 import '../../domain/use_cases/register_step_one_usecase.dart';
@@ -30,8 +31,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     if (response.responseSuccessful!) {
-      Logger()
-          .t("Step On Registered Successfully ${response.responseMessage!}");
+      Logger().t(
+          "Step On Registered Successfully ${response.responseMessage!},${response.responseBody!}");
 
       emit(
         AuthSuccessState(
@@ -39,6 +40,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           message: "Step On Registered Successfully",
         ),
       );
+
+      LocalStorageHelper().setUserToken(response.responseBody!);
     } else {
       Logger().e("Failed to Register Step One ${response.responseMessage!}");
 

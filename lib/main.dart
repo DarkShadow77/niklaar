@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'app/theme/theme_util.dart';
 import 'core/constants/app_colors.dart';
@@ -14,10 +15,17 @@ import 'core/di/service_locator.dart';
 import 'features/auth/presentation/manager/auth_bloc.dart';
 
 void main() async {
+  //Initialize Hive for local storage
+  await Hive.initFlutter();
+
+  await Hive.openBox(Strings.appName);
+
   WidgetsFlutterBinding.ensureInitialized();
 
   //Initialize dotenv for environment variables
   await dotenv.load(fileName: ".env.development");
+
+  await initDI();
 
   runApp(const MyApp());
 }

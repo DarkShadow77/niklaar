@@ -26,7 +26,7 @@ class TextInputField extends StatefulWidget {
     this.hintColor,
     this.inputFormatters,
     this.validator,
-    this.autoValidateMode,
+    this.autoValidateMode = AutovalidateMode.onUserInteraction,
   });
 
   final TextEditingController controller;
@@ -124,6 +124,7 @@ class _TextInputFieldState extends State<TextInputField> {
                       TextStyles.normalRegular14(context).fontSize! + 2.sp,
                   color: widget.hintColor ?? AppColors.black20,
                 ),
+                errorStyle: const TextStyle(fontSize: 0, height: -2),
                 border: InputBorder.none,
               ),
               style: TextStyles.normalRegular14(context).copyWith(

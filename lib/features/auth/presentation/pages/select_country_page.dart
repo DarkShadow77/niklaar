@@ -165,22 +165,23 @@ class _SelectCountryPageState extends State<SelectCountryPage> {
                     delegate: SliverChildBuilderDelegate(
                       childCount: _filteredCountries.length,
                       (ctx, idx) {
-                        if (idx.isOdd) {
-                          return SizedBox(
-                            height: 12.h,
-                          );
-                        }
-
                         Country country = _filteredCountries[idx];
 
                         final showLabel = idx == 0 ||
                             country.name[0] !=
                                 _filteredCountries[idx - 1].name[0];
 
-                        return _buildCountryTile(
-                          context,
-                          country: country,
-                          showLabel: showLabel,
+                        return Column(
+                          children: [
+                            _buildCountryTile(
+                              context,
+                              country: country,
+                              showLabel: showLabel,
+                            ),
+                            SizedBox(
+                              height: 12.h,
+                            ),
+                          ],
                         );
                       },
                     ),
