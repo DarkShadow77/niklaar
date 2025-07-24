@@ -12,7 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<ApiResponse> registerStepOne({
+  Future<ApiResponse<String>> registerStepOne({
     required StepOneRequestModel request,
   }) async {
     return await authRemoteDataSource.registerStepOne(

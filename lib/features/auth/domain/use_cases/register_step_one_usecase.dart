@@ -9,7 +9,7 @@ class RegisterStepOneUseCase {
 
   RegisterStepOneUseCase({required this.authRepository});
 
-  Future<ApiResponse> call({
+  Future<ApiResponse<String>> call({
     required StepOneRequestModel request,
   }) async {
     return await authRepository.registerStepOne(
