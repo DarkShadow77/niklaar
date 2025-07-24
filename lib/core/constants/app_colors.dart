@@ -65,6 +65,7 @@ class AppColors {
 
 //State-Colors ---Success
   static const Color success = Color(0xFF1CC17F);
+  static Color success50 = success.withOpacity(.50);
   static Color success39 = success.withOpacity(.39);
   static Color success11 = success.withOpacity(.11);
   static Color success5 = success.withOpacity(.05);
