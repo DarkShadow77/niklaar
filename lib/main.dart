@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,8 @@ import 'core/constants/app_colors.dart';
 import 'core/constants/navigators/routeName.dart';
 import 'core/constants/navigators/router.dart';
 import 'core/constants/strings.dart';
+import 'core/di/service_locator.dart';
+import 'features/auth/presentation/manager/auth_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +29,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use with Google Fonts package to use downloadable fonts
-    TextTheme textTheme = createTextTheme(context, "Barriecito", "Barriecito");
+    TextTheme textTheme = createTextTheme(context, "Roboto", "Roboto");
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -43,23 +46,30 @@ class MyApp extends StatelessWidget {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
-      child: ScreenUtilInit(
-          designSize: const Size(430, 932),
-          builder: (BuildContext context, Widget? child) {
-            return GetMaterialApp(
-              title: Strings.appName,
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                textTheme: textTheme,
-                colorScheme: ColorScheme.fromSeed(
-                  seedColor: AppColors.primary,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthBloc>(
+            create: (context) => sl<AuthBloc>(),
+          ),
+        ],
+        child: ScreenUtilInit(
+            designSize: const Size(430, 932),
+            builder: (BuildContext context, Widget? child) {
+              return GetMaterialApp(
+                title: Strings.appName,
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  textTheme: textTheme,
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: AppColors.primary,
+                  ),
+                  useMaterial3: true,
                 ),
-                useMaterial3: true,
-              ),
-              onGenerateRoute: generateRoute,
-              initialRoute: RouteName.splashPage,
-            );
-          }),
+                onGenerateRoute: generateRoute,
+                initialRoute: RouteName.splashPage,
+              );
+            }),
+      ),
     );
   }
 }
